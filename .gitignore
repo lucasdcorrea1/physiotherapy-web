@@ -1,0 +1,57 @@
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+dist-ssr/
+build/
+.vite/
+node_modules/.vite/
+
+# Caches
+.cache/
+.parcel-cache/
+.eslintcache
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env files (keep an example)
+.env
+.env.*
+!.env.example
+
+# Editors/IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# System files
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Coverage
+coverage/
+
+# Hosting
+.vercel/
+
+# Temp
+tmp/
+temp/
