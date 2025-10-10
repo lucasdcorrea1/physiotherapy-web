@@ -1,61 +1,10 @@
-import { useEffect, useRef } from "react"
+// (removido: import React from "react")
+import Timeline, { type TimelineItem } from "./components/Timeline"
 
 const WHATSAPP = "5511999990000" // troque pelo número real (apenas dígitos)
 const wa = (msg: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`
 const heroImg =
   "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=1600&q=80"
-
-/* ============== Timeline (History) embutida ============== */
-type TimelineItem = { date: string; title: string; text: string; image: string }
-
-function Timeline({
-  items,
-  heading = "História",
-  subheading,
-}: { items: TimelineItem[]; heading?: string; subheading?: string }) {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const root = ref.current
-    if (!root) return
-    const els = Array.from(root.querySelectorAll<HTMLElement>(".tl__item"))
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("reveal")),
-      { threshold: 0.18, rootMargin: "0px 0px -10% 0px" }
-    )
-    els.forEach((el) => io.observe(el))
-    return () => io.disconnect()
-  }, [])
-
-  return (
-    <section className="section" id="timeline">
-      <div className="container">
-        <h2 className="h">{" "}
-          {heading}
-        </h2>
-        {subheading && <p className="sub muted">{subheading}</p>}
-
-        <div className="tl" ref={ref}>
-          <div className="tl__line" aria-hidden />
-          {items.map((it, i) => {
-            const side = i % 2 === 0 ? "left" : "right"
-            return (
-              <article className={`tl__item ${side}`} key={i}>
-                <time className="tl__date" dateTime={it.date}>{it.date}</time>
-                <div className="tl__media"><img src={it.image} alt={it.title} loading="lazy" /></div>
-                <div className="tl__content">
-                  <h3 className="tl__title">{it.title}</h3>
-                  <p className="tl__text">{it.text}</p>
-                </div>
-              </article>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
-}
-/* ========================================================= */
 
 export default function App() {
   const year = new Date().getFullYear()
@@ -89,7 +38,7 @@ export default function App() {
 
   return (
     <main className="site">
-      {/* fundo 2025: blobs + radiais */}
+      {/* fundo */}
       <div className="bg">
         <div className="blob b1" />
         <div className="blob b2" />
@@ -184,11 +133,7 @@ export default function App() {
       </section>
 
       {/* Timeline */}
-      <Timeline
-        heading="História"
-        subheading="Minha jornada de formação e clínica."
-        items={timelineItems}
-      />
+      <Timeline heading="História" subheading="Minha jornada de formação e clínica." items={timelineItems} />
 
       {/* Contato */}
       <section id="contato" className="section container contact">
@@ -208,7 +153,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* FORM com respiro e foco bonito */}
         <form
           className="form"
           onSubmit={(e) => {

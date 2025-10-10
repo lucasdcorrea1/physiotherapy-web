@@ -21,18 +21,18 @@ export default function Timeline({ items, heading = "Linha do tempo", subheading
     if (!root) return
     const targets = Array.from(root.querySelectorAll<HTMLElement>(".tl__item"))
     const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("in-view")),
-      { threshold: 0.2 }
+      (entries) => entries.forEach((e) => e.isIntersecting && e.target.classList.add("reveal")),
+      { threshold: 0.18, rootMargin: "0px 0px -10% 0px" }
     )
     targets.forEach((el) => io.observe(el))
     return () => io.disconnect()
   }, [])
 
   return (
-    <section className="section">
+    <section className="section" id="timeline">
       <div className="container">
         <h2 className="h">{heading}</h2>
-        {subheading && <p className="sub">{subheading}</p>}
+        {subheading && <p className="sub muted">{subheading}</p>}
 
         <div className="tl" ref={containerRef}>
           <div className="tl__line" aria-hidden />
