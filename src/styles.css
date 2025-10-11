@@ -17,10 +17,10 @@
   --sp-1:8px;  --sp-2:12px; --sp-3:16px; --sp-4:20px;
   --sp-5:24px; --sp-6:28px; --sp-7:36px; --sp-8:48px; --sp-9:64px;
 
-  /* 🎯 Foco do enquadramento do hero
-     Menor = sobe a imagem (mostra mais a cabeça) | Maior = desce */
+  /* 🎯 Foco do enquadramento do hero (mesmo em todas as resoluções)
+     Menor = imagem “desce” e mostra mais a cabeça */
   --hero-focus-y-desktop: 1%;
-  --hero-focus-y-mobile: 30%;
+  --hero-focus-y-mobile: 1%;
 }
 
 @media (prefers-color-scheme: light){
@@ -144,30 +144,23 @@ img{ max-width:100%; height:auto; display:block }
   position:relative;
   overflow:visible; /* deixa o card sair pra fora da foto */
 }
-
-
-
 .hero__media img{
-  transform: translateY(40px) !important; /* positivo = desce a imagem */
   width:100%;
   border-radius:var(--radius-lg);
   border:1px solid var(--line);
   box-shadow:var(--shadow);
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 3;     /* mantém o mesmo frame em todas as telas */
   object-fit: cover;
-  object-position: center var(--hero-focus-y-desktop) !important;
-  transform: none !important;
-}
-@media (min-width: 981px){
-  /* opcional: mostra um pouco mais de área vertical no desktop */
-  .hero__media img{ aspect-ratio: 16 / 10; }
+  object-position: center var(--hero-focus-y-desktop);
+  transform: translateY(40px); /* mesmo deslocamento em todas as resoluções */
 }
 @media (max-width: 980px){
-  .hero__media img{ object-position: center var(--hero-focus-y-mobile) !important; }
+  /* usa o mesmo foco vertical no mobile para manter igual ao desktop */
+  .hero__media img{ object-position: center var(--hero-focus-y-mobile); }
 }
 .hero__card{
   position:absolute;
-  right:-14px;           /* um pouco mais “pra fora” */
+  right:-14px;           
   bottom:-18px;
   padding:12px 14px; border-radius:14px;
   background:var(--panel); backdrop-filter:blur(10px); border:1px solid var(--line);
