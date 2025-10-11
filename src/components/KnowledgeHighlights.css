@@ -1,11 +1,9 @@
-/* src/components/KnowledgeHighlights.css */
-
 /* Section spacing */
 .kh { padding-top: var(--sp-8); }
 .kh__header { margin-bottom: var(--sp-4); }
 .kh__header .h { margin: 0 0 var(--sp-2); }
 
-/* Responsive grid: 3 / 2 / 1 col */
+/* Grid responsivo: 3 / 2 / 1 col */
 .kh__grid{
   display: grid;
   gap: var(--sp-3);
@@ -18,24 +16,29 @@
   .kh__grid{ grid-template-columns: 1fr; }
 }
 
-/* Card: elegante, alinhado, altura consistente */
+/* Card elegante, limpo e consistente */
 .kh__card{
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-  min-height: 220px;                    /* mantém “tensão” semelhante entre cards */
+  min-height: 220px;
   padding: calc(var(--sp-4) - 2px) var(--sp-4);
   border: 1px solid var(--line);
   border-radius: 16px;
   background:
-    linear-gradient(0deg, color-mix(in oklab, var(--panel), transparent 15%), color-mix(in oklab, var(--panel), transparent 15%));
+    linear-gradient(
+      0deg,
+      color-mix(in oklab, var(--panel), transparent 12%),
+      color-mix(in oklab, var(--panel), transparent 12%)
+    );
   box-shadow: 0 10px 28px rgba(0,0,0,.12);
-  position: relative;
   overflow: hidden;
   isolation: isolate;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
-/* Borda-luz lateral suave, bem premium */
+/* Filete lateral suave (roxo→verde) */
 .kh__card::before{
   content:"";
   position:absolute;
@@ -43,23 +46,48 @@
   width: 6px;
   border-radius: 16px 0 0 16px;
   background: linear-gradient(180deg, var(--accent2), var(--accent));
-  filter: saturate(1.2);
   opacity: .9;
-  z-index: -1;
+  z-index: 0;
 }
 
-/* Head: ícone + título alinhados */
-.kh__head{
+/* Cantinho decorativo sutil (canto superior direito) */
+.kh__corner{
+  content:"";
+  position: absolute;
+  right: -18px; top: -18px;
+  width: 80px; height: 80px;
+  border-radius: 999px;
+  background: radial-gradient(
+    50px 50px at 50% 50%,
+    color-mix(in oklab, var(--accent2) 28%, transparent) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Hover sutil: eleva e acentua a borda */
+.kh__card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0,0,0,.18);
+  border-color: color-mix(in oklab, var(--line), var(--accent2) 22%);
+}
+
+/* Cabeçalho do card */
+.kh__topbar{
   display: flex;
   align-items: center;
   gap: 10px;
+  position: relative;
+  z-index: 1;
 }
-.kh__icon{
+.kh__chip{
   display:grid; place-items:center;
   width: 34px; height: 34px;
   border-radius: 10px;
   background: linear-gradient(135deg, var(--accent2), var(--accent));
-  color: #001018; font-size: 18px; font-weight: 700;
+  color: #06131f;
+  font-size: 18px; font-weight: 700;
   box-shadow: var(--shadow);
   border: 1px solid color-mix(in oklab, var(--accent2), #000 10%);
 }
@@ -70,43 +98,33 @@
   color: var(--ink-strong);
 }
 
-/* Lista: alinhada, respirando, bullets discretos */
+/* Lista enxuta e alinhada */
 .kh__list{
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 8px;
+  margin: 0; padding: 0; list-style: none;
+  display: grid; gap: 8px;
+  position: relative; z-index: 1;
 }
-.kh__list li{
+.kh__li{
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  align-items: start;
+  gap: 8px;
   color: var(--ink);
   font-size: 14.5px;
   line-height: 1.6;
-  position: relative;
-  padding-left: 16px;
 }
-.kh__list li::before{
-  content:"";
-  position:absolute;
-  left:0; top:.72em;
-  width:7px; height:7px; border-radius:999px;
+.kh__dot{
+  width:7px; height:7px; border-radius:999px; margin-top:.6em;
   background: color-mix(in oklab, var(--accent2), var(--accent) 35%);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent2), transparent 80%);
 }
 
-/* Meta: alinhado ao rodapé sem “pular” */
+/* Meta no rodapé do card */
 .kh__meta{
-  margin-top: auto;                     /* empurra para a base do card */
+  margin-top: auto;
   padding-top: var(--sp-2);
   border-top: 1px dashed color-mix(in oklab, var(--line), transparent 20%);
   color: color-mix(in oklab, var(--muted), #fff 6%);
   font-size: 13.5px;
-}
-
-/* Hover sutil (não vira botão) */
-.kh__card:hover{
-  border-color: color-mix(in oklab, var(--line), var(--accent2) 22%);
-  box-shadow: 0 16px 36px rgba(0,0,0,.16);
-  transform: translateY(-1px);
-  transition: all .18s ease;
+  position: relative; z-index: 1;
 }

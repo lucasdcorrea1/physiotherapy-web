@@ -1,3 +1,4 @@
+// src/components/🧩 FAQ.tsx
 import { useState, useRef, useEffect } from "react"
 import "./FAQ.css"
 
@@ -8,20 +9,24 @@ interface QA {
 
 const faqs: QA[] = [
   {
-    q: "Como funciona a avaliação inicial?",
-    a: "Avaliamos postura, mobilidade e histórico. Você recebe um plano personalizado e metas claras."
+    q: "O que você faz na prática?",
+    a: "Avalio de forma simples, defino metas junto com a pessoa e aplico exercícios, educação em dor e técnicas manuais quando necessário — sempre de maneira segura e clara."
   },
   {
-    q: "Atende dor lombar crônica?",
-    a: "Sim. Trabalho com educação em dor, exercícios graduais e estratégias baseadas em evidências."
+    q: "Em quais casos costuma atuar?",
+    a: "Quadros musculoesqueléticos (lombar, joelho, ombro), respiratórios e neurofuncionais (equilíbrio e marcha), com foco em retorno às atividades e autonomia."
   },
   {
-    q: "Quanto tempo dura cada sessão?",
-    a: "Em média 50–60 minutos, variando conforme a necessidade do caso."
+    q: "Como é a primeira conversa?",
+    a: "Escuto o histórico, defino objetivos fáceis de entender e proponho um plano inicial curto, com orientações para casa e ajustes a cada encontro."
   },
   {
-    q: "Há atendimento para crianças/adolescentes?",
-    a: "Sim, com abordagem adaptada e orientação à família."
+    q: "Como acompanha a evolução?",
+    a: "Registro metas e exercícios de forma objetiva e faço reavaliações periódicas. Assim fica claro o que está funcionando e o que precisa ajustar."
+  },
+  {
+    q: "Como falar com você?",
+    a: "Pode me chamar no WhatsApp (+55 35 99819-3849) para um bate-papo rápido, ou por e-mail em vitoria@universidade.com."
   }
 ]
 
@@ -38,8 +43,10 @@ export default function FAQ() {
 
   return (
     <section id="faq" className="section container faq">
-      <h2 className="h">Dúvidas frequentes</h2>
-      <p className="sub muted">Perguntas comuns sobre o atendimento e os serviços.</p>
+      <h2 className="h">Perguntas rápidas</h2>
+      <p className="sub muted">
+        Como trabalho no dia a dia — direto ao ponto.
+      </p>
 
       <div className="faq__list">
         {faqs.map((item, i) => (

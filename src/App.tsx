@@ -1,3 +1,4 @@
+// src/App.tsx
 import { useEffect, useState } from "react";
 import History from "./components/History";
 import FeedbackList from "./components/FeedbackList";
@@ -5,7 +6,6 @@ import FAQ from "./components/🧩 FAQ";
 import KnowledgeHighlights from "./components/KnowledgeHighlights";
 import ScrollProgress from "./components/ScrollProgress";
 
-// imagem local já usada por você
 import heroImg from "./assets/vitoria2.jpeg";
 
 const WHATSAPP = "5535998193849"; // +55 35 99819-3849 (apenas dígitos)
@@ -16,10 +16,13 @@ export default function App() {
   const year = new Date().getFullYear();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // breakpoints para decidir se aplica o "hide on scroll"
+  // breakpoint p/ aplicar hide-on-scroll só no mobile
   const [isMobile, setIsMobile] = useState<boolean>(() =>
-    typeof window !== "undefined" ? window.matchMedia("(max-width: 920px)").matches : true
+    typeof window !== "undefined"
+      ? window.matchMedia("(max-width: 920px)").matches
+      : true
   );
+
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 920px)");
     const onChange = () => setIsMobile(mq.matches);
@@ -27,13 +30,12 @@ export default function App() {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  // esconder/mostrar header somente no mobile
+  // esconder/mostrar header somente no mobile (ao rolar)
   const [headerHidden, setHeaderHidden] = useState(false);
   useEffect(() => {
     let lastY = window.scrollY;
     const onScroll = () => {
       if (!isMobile) {
-        // em telas maiores, header sempre visível
         if (headerHidden) setHeaderHidden(false);
         return;
       }
@@ -45,7 +47,20 @@ export default function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isMobile, headerHidden]);
 
-  // expõe no <html> para o CSS posicionar a barra de progresso corretamente
+  // travar/destravar scroll do body quando o menu abrir (somente mobile)
+  useEffect(() => {
+    const lock = menuOpen && isMobile;
+    document.body.style.overflow = lock ? "hidden" : "";
+    document.documentElement.setAttribute(
+      "data-menu-open",
+      lock ? "true" : "false"
+    );
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen, isMobile]);
+
+  // expõe flag no <html> para posicionar a barra de progresso
   useEffect(() => {
     document.documentElement.setAttribute(
       "data-header-hidden",
@@ -55,15 +70,16 @@ export default function App() {
 
   return (
     <main className="site">
-      {/* fundo */}
-      <div className="bg">
-        <div className="blob b1" />
-        <div className="blob b2" />
-        <div className="blob b3" />
-      </div>
+      {/* Fundo */}
+      <div className="bg" />
 
       {/* Topbar */}
-      <header className={`topbar ${headerHidden ? "is-hidden" : ""}`} role="banner">
+      <header
+        className={`topbar ${headerHidden ? "is-hidden" : ""} ${
+          menuOpen ? "menu-open" : ""
+        }`}
+        role="banner"
+      >
         <a
           href="#top"
           className="brand"
@@ -100,19 +116,25 @@ export default function App() {
           <a href="#servicos">Competências</a>
           <a href="#sobre">Sobre</a>
           <a href="#timeline">História</a>
+          <a href="#interesses">Interesses</a>
           <a href="#contato">Contato</a>
           <a
             className="btn small"
             href={wa(
-              "Olá, gostaria de falar sobre oportunidades de estágio/colaboração."
+              "Olá, tudo bem? Gostaria de conversar sobre uma oportunidade de estágio em Fisioterapia."
             )}
             target="_blank"
             rel="noreferrer"
           >
-            Falar no WhatsApp
+            Conversar sobre estágio
           </a>
         </nav>
       </header>
+
+      {/* Scrim (fundo escuro atrás do painel do menu) */}
+      {isMobile && menuOpen && (
+        <div className="nav-scrim" onClick={() => setMenuOpen(false)} aria-hidden />
+      )}
 
       {/* Barra de progresso sempre visível */}
       <ScrollProgress />
@@ -124,71 +146,70 @@ export default function App() {
             Vitória Silva — <span className="grad">Fisioterapia</span>
           </h1>
           <p>
-            Estudante no <strong>último ano</strong>, em estágio prático
-            supervisionado, com atuação em <strong>múltiplas áreas</strong>:
-            musculoesquelética, respiratória, neurológica e cardiorrespiratória.
-            Atendo com <strong>comunicação clara</strong>, foco em{" "}
-            <strong>resultados</strong> e plano de cuidado{" "}
-            <strong>centrado na pessoa</strong>. Em busca de novos desafios e
-            oportunidades para contribuir e evoluir.
+            Estudante do <strong>último ano</strong> com prática clínica
+            supervisionada em <strong>múltiplas áreas</strong> — musculoesquelética,
+            respiratória, neurológica e cardiorrespiratória. Comunicação{" "}
+            <strong>clara</strong>, registro <strong>objetivo</strong> e foco em{" "}
+            <strong>evolução mensurável</strong>. Busco minha{" "}
+            <strong>primeira vaga de estágio</strong> para aprender com a equipe
+            e contribuir no cuidado ao paciente.
           </p>
           <div className="hero__cta">
             <a
               className="btn"
               href={wa(
-                "Olá! Gostaria de saber mais sobre seu perfil e disponibilidade."
+                "Olá! Sou a Vitória Silva (Fisioterapia). Podemos conversar sobre estágio?"
               )}
               target="_blank"
               rel="noreferrer"
             >
-              Conversar agora
+              Conversar sobre estágio
             </a>
             <a className="btn ghost" href="#servicos">
               Ver competências
             </a>
           </div>
           <ul className="badges" aria-label="Destaques">
-            <li>Estágio supervisionado</li>
-            <li>Atendimento humanizado</li>
-            <li>Evidências na prática</li>
+            <li>Postura profissional & ética</li>
+            <li>Registro claro de desfechos</li>
+            <li>Acolhimento e escuta ativa</li>
           </ul>
         </div>
         <div className="hero__media">
           <img src={heroImg} alt="Vitória Silva — Estudante de Fisioterapia" />
           <div className="hero__card">
             <strong>Objetivo</strong>
-            <span>Estágio e projetos em reabilitação</span>
+            <span>Conquistar a 1ª vaga de estágio</span>
           </div>
         </div>
       </section>
 
       {/* Competências */}
       <section id="servicos" className="section container">
-        <h2 className="h">Competências & Interesses</h2>
+        <h2 className="h">Competências em prática</h2>
         <p className="sub muted">
-          Um recorte direto do que aplico no estágio — com segurança, empatia e
-          progresso mensurável.
+          O essencial que aplico no dia a dia: método, clareza e segurança.
         </p>
         <div className="grid">
           <article className="card hover">
             <h3>Base Clínica</h3>
             <p>
-              Avaliação funcional, raciocínio clínico e definição de condutas
-              com metas objetivas.
+              Avaliação funcional objetiva, raciocínio clínico e plano com metas
+              claras para orientar progressões.
             </p>
           </article>
           <article className="card hover">
             <h3>Recursos Terapêuticos</h3>
             <p>
-              Cinesioterapia, técnicas manuais, exercícios terapêuticos e
-              educação em dor.
+              Cinesioterapia, técnicas manuais quando indicadas, educação em dor
+              e exercícios focados na função.
             </p>
           </article>
           <article className="card hover">
             <h3>Acompanhamento</h3>
             <p>
-              Reavaliações, registros objetivos e ajustes de plano conforme
-              evolução e objetivos pessoais.
+              Reavaliações, registros simples e objetivos, revisão de conduta por
+              desfechos e feedbacks.
             </p>
           </article>
         </div>
@@ -198,15 +219,16 @@ export default function App() {
       <section id="sobre" className="section container about">
         <h2 className="h">Sobre a Vitória</h2>
         <p className="muted">
-          Foco em comunicação acessível, acolhimento e construção conjunta do
-          tratamento. Valorizo metas claras, progressões seguras e autonomia no
-          cuidado, sempre com base em evidências e nas preferências da pessoa.
+          Busco aprender com a equipe e contribuir no que estiver ao meu alcance:
+          organização do atendimento, comunicação acessível e dedicação a cada
+          pessoa. Compromisso com segurança, ética e prática baseada em evidências —
+          sempre com acolhimento e respeito.
         </p>
         <div className="about__split">
           <ul className="list">
-            <li>✓ Estágio prático em múltiplas áreas</li>
-            <li>✓ Abordagem humanizada e orientada a metas</li>
-            <li>✓ Educação em dor e exercícios terapêuticos</li>
+            <li>✓ Vivência em múltiplas áreas clínicas</li>
+            <li>✓ Comunicação simples e empática</li>
+            <li>✓ Foco em metas e desfechos clínicos</li>
           </ul>
           <div className="stats">
             <div className="stat">
@@ -219,26 +241,59 @@ export default function App() {
             </div>
             <div className="stat">
               <strong>100%</strong>
-              <span>compromisso com a segurança</span>
+              <span>compromisso com segurança</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Conhecimentos */}
+      {/* Conhecimentos (cards elegantes) */}
       <KnowledgeHighlights />
 
       {/* História (Timeline) */}
       <History />
 
-      {/* Contato */}
+      {/* Interesses atuais */}
+      <section id="interesses" className="section container">
+        <h2 className="h">Interesses atuais</h2>
+        <p className="sub muted">
+          Frentes em que estou aprofundando prática e estudo.
+        </p>
+
+        <div className="cards interests">
+          <div className="card">
+            <strong className="interest-title">Musculoesquelética</strong>
+            <span className="interest-desc">
+              Dor lombar, joelho e ombro • retorno às atividades
+            </span>
+          </div>
+          <div className="card">
+            <strong className="interest-title">Neurofuncional</strong>
+            <span className="interest-desc">
+              Controle motor, equilíbrio e marcha
+            </span>
+          </div>
+          <div className="card">
+            <strong className="interest-title">Cardiorrespiratória</strong>
+            <span className="interest-desc">
+              Condicionamento físico e educação em saúde
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Contato (no fim do site) */}
       <section id="contato" className="section container contact">
         <h2 className="h">Contato</h2>
+        <p className="sub muted">
+          Fico feliz em conversar sobre uma oportunidade — respondo com agilidade.
+        </p>
+
         <div className="cards contact__cards">
           <a
             className="card link"
             href={wa(
-              "Olá, Vitória! Vim pelo seu site e gostaria de falar sobre oportunidades."
+              "Olá, Vitória! Gostaria de conversar sobre uma oportunidade de estágio."
             )}
             target="_blank"
             rel="noreferrer"
@@ -251,7 +306,7 @@ export default function App() {
             <span className="muted">vitoria@universidade.com</span>
           </a>
           <div className="card">
-            <strong>Local</strong>
+            <strong>Cidade</strong>
             <span className="muted">Franca/SP — Brasil</span>
           </div>
         </div>
@@ -264,9 +319,7 @@ export default function App() {
             const data = new FormData(form);
             const msg =
               `Olá, sou ${data.get("nome")} (${data.get("email")}). ` +
-              `Assunto: ${data.get("assunto")}. Mensagem: ${data.get(
-                "mensagem"
-              )}`;
+              `Assunto: ${data.get("assunto")}. Mensagem: ${data.get("mensagem")}`;
             window.open(wa(msg), "_blank");
             form.reset();
           }}
@@ -293,7 +346,7 @@ export default function App() {
             <input
               id="assunto"
               name="assunto"
-              placeholder="Oportunidade, estágio, parceria..."
+              placeholder="Oportunidade de estágio em Fisioterapia"
             />
           </div>
 
@@ -322,39 +375,10 @@ export default function App() {
       {/* FAQ */}
       <FAQ />
 
-      {/* Mapa */}
-      <section id="mapa" className="section container">
-        <h2 className="h">Como chegar</h2>
-        <p className="sub muted">Atividades e estudos em Franca (SP)</p>
-        <div className="map-wrapper">
-          <iframe
-            title="Mapa – Franca/SP"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3738.798229199208!2d-47.40136962575971!3d-20.539321358368823!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94b0a996e56b9a9b%3A0x5b0c23b3e5a4541d!2sFranca%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1699999999999!5m2!1spt-BR!2sbr"
-            width="100%"
-            height="400"
-            style={{ border: 0, borderRadius: "var(--radius)" }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
-        </div>
-      </section>
-
       {/* Rodapé */}
       <footer className="footer container">
         © {year} Vitória Silva — Estudante de Fisioterapia.
       </footer>
-
-      {/* WhatsApp flutuante */}
-      <a
-        className="fab"
-        href={wa("Olá Vitória! Vim pelo site.")}
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Abrir WhatsApp"
-      >
-        ☻
-      </a>
     </main>
   );
 }

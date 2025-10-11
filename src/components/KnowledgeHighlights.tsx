@@ -1,69 +1,67 @@
-// src/components/KnowledgeHighlights.tsx
 import "./KnowledgeHighlights.css"
 
-type Item = {
-  title: string
-  points: string[]
-  meta?: string
-  icon?: string
-}
+type Item = { title: string; points: string[]; meta?: string; icon?: string }
 
 const ITEMS: Item[] = [
   {
     title: "Músculo-esquelético",
     icon: "💪",
     points: [
-      "Avaliação funcional objetiva",
-      "Cinesioterapia e progressões seguras",
-      "Retorno à função com metas claras",
+      "Avaliação funcional objetiva (dor, força, mobilidade)",
+      "Cinesioterapia com progressões seguras",
+      "Retorno às atividades com metas claras",
     ],
-    meta: "Estágio prático supervisionado",
+    meta: "Pronta para apoiar volume de atendimentos",
   },
   {
     title: "Cardiorrespiratório",
     icon: "🌬️",
     points: [
-      "Atenção respiratória e condicionamento",
-      "Monitoramento e educação em autocuidado",
-      "Plano individualizado e revisões periódicas",
+      "Condicionamento e atenção respiratória",
+      "Educação em autocuidado e sinais de alerta",
+      "Plano individual e revisões periódicas",
     ],
+    meta: "Condutas alinhadas a protocolos da equipe",
   },
   {
     title: "Neurofuncional",
     icon: "🧠",
     points: [
       "Reabilitação sensório-motora",
-      "Exercícios orientados à função",
-      "Treino de equilíbrio e marcha",
+      "Treino de marcha, equilíbrio e função",
+      "Orientações simples e aplicáveis no dia a dia",
     ],
+    meta: "Foco em segurança e autonomia do paciente",
   },
   {
-    title: "Avaliação & Medidas",
+    title: "Avaliação & Indicadores",
     icon: "📏",
     points: [
       "Testes funcionais e registros objetivos",
-      "Reavaliação por desfechos",
-      "Evidências para decisão clínica",
+      "Reavaliação por desfechos clínicos",
+      "Decisão baseada em evidências",
     ],
+    meta: "Documentação clara e organizada",
   },
   {
-    title: "Técnicas Manuais",
+    title: "Técnicas Manuais (apoio)",
     icon: "🤲",
     points: [
-      "Alívio de dor e rigidez",
-      "Mobilizações e orientações de autocuidado",
-      "Integração com exercícios ativos",
+      "Alívio de dor e rigidez quando indicado",
+      "Mobilizações + autocuidado orientado",
+      "Integração com exercício ativo",
     ],
+    meta: "Uso responsável, com critérios definidos",
   },
   {
-    title: "Abordagem Humana",
+    title: "Postura Profissional",
     icon: "🌿",
     points: [
-      "Escuta ativa e educação em dor",
-      "Comunicação simples e empática",
-      "Acompanhamento próximo",
+      "Escuta ativa e comunicação empática",
+      "Trabalho em equipe e receptividade a feedback",
+      "Ética, segurança e responsabilidade",
     ],
-    meta: "Foco em segurança e clareza",
+    meta: "Objetivo: estágio para aprender e contribuir",
   },
 ]
 
@@ -71,27 +69,31 @@ export default function KnowledgeHighlights() {
   return (
     <section id="conhecimentos" className="kh section container" aria-labelledby="kh-title">
       <header className="kh__header">
-        <h2 id="kh-title" className="h">Resumo de Competências</h2>
+        <h2 id="kh-title" className="h">Pronta para Estágio</h2>
         <p className="sub muted">
-          Um recorte direto do que a <strong>Vitória Silva</strong> pratica no estágio — com foco em resultados, segurança e cuidado humano.
+          O essencial que a <strong>Vitória</strong> entrega: organização, clareza e evolução mensurável.
         </p>
       </header>
 
       <div className="kh__grid">
         {ITEMS.map((item, i) => (
           <article className="kh__card" key={i}>
-            <div className="kh__head">
-              {item.icon && <span className="kh__icon" aria-hidden>{item.icon}</span>}
+            <div className="kh__topbar">
+              {item.icon && <span className="kh__chip" aria-hidden>{item.icon}</span>}
               <h3 className="kh__title">{item.title}</h3>
             </div>
 
             <ul className="kh__list">
               {item.points.map((p, idx) => (
-                <li key={idx}>{p}</li>
+                <li className="kh__li" key={idx}>
+                  <span className="kh__dot" aria-hidden />
+                  <span>{p}</span>
+                </li>
               ))}
             </ul>
 
             {item.meta && <div className="kh__meta">{item.meta}</div>}
+            <span className="kh__corner" aria-hidden />
           </article>
         ))}
       </div>
