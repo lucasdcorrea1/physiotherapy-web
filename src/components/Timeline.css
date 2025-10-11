@@ -165,16 +165,6 @@
 
 /* Corrige corte do primeiro item */
 /* ==== Corrige corte no topo da timeline ==== */
-#timeline {
-  padding-top: 140px;
-  scroll-margin-top: 140px;
-}
 
-@media (max-width: 640px) {
-  #timeline {
-    padding-top: 100px;
-    scroll-margin-top: 100px;
-  }
-}
 
 
