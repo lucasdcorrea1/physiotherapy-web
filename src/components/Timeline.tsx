@@ -1,3 +1,5 @@
+import "./Timeline.css";
+
 import { useEffect, useRef } from "react"
 
 export type TimelineItem = {

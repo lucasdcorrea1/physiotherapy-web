@@ -1,0 +1,180 @@
+/* ===================== Timeline (History) ===================== */
+.tl {
+  position: relative;
+  margin-top: 140px; /* <---- adiciona espaçamento interno REAL acima da linha */
+  display: grid;
+  gap: var(--sp-4);
+}
+
+
+/* Linha central */
+.tl__line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(#97a4be44, #97a4be88);
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+/* Cada item */
+.tl__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 80px 1fr;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 220px;
+  isolation: isolate;
+  transform: translateY(12px);
+  opacity: 0;
+  transition: all 0.6s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+.tl__item.reveal {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Bolinha */
+.tl__item::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--accent2);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 12px rgba(14, 165, 233, 0.25);
+  z-index: 2;
+}
+
+/* Data */
+.tl__date {
+  grid-column: 2;
+  justify-self: center;
+  position: relative;
+  top: -18px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 12.5px;
+  z-index: 3;
+  backdrop-filter: blur(6px) saturate(1.1);
+  box-shadow: 0 6px 20px rgba(2, 6, 23, 0.25);
+}
+
+/* Colunas alternadas */
+.tl__item.left .tl__media {
+  grid-column: 1;
+}
+.tl__item.left .tl__content {
+  grid-column: 3;
+}
+.tl__item.right .tl__media {
+  grid-column: 3;
+}
+.tl__item.right .tl__content {
+  grid-column: 1;
+}
+
+/* Imagem e conteúdo */
+.tl__media {
+  position: relative;
+  z-index: 0;
+}
+.tl__media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  pointer-events: none;
+}
+.tl__media img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.25);
+}
+
+.tl__content {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: var(--sp-4);
+  box-shadow: var(--shadow);
+}
+
+.tl__title {
+  margin: 0 0 6px;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  color: var(--ink-strong);
+}
+.tl__text {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* ====== Responsivo ====== */
+@media (max-width: 900px) {
+  .tl__line {
+    left: 16px;
+    transform: none;
+  }
+  .tl__item {
+    grid-template-columns: 28px 1fr;
+    gap: var(--sp-2);
+    min-height: 180px;
+  }
+  .tl__item::before {
+    left: 16px;
+    transform: translate(-50%, -50%);
+  }
+  .tl__date {
+    grid-column: 1;
+    justify-self: center;
+    top: -12px;
+  }
+  .tl__item.left .tl__media,
+  .tl__item.left .tl__content,
+  .tl__item.right .tl__media,
+  .tl__item.right .tl__content {
+    grid-column: 2;
+  }
+}
+
+/* Pequena animação suave ao revelar */
+@keyframes tlFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.tl__item.reveal {
+  animation: tlFade 0.8s ease forwards;
+}
+
+
+/* Corrige corte do primeiro item */
+/* ==== Corrige corte no topo da timeline ==== */
+#timeline {
+  padding-top: 140px;
+  scroll-margin-top: 140px;
+}
+
+@media (max-width: 640px) {
+  #timeline {
+    padding-top: 100px;
+    scroll-margin-top: 100px;
+  }
+}
+
+

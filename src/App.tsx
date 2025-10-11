@@ -1,40 +1,18 @@
-// (removido: import React from "react")
-import Timeline, { type TimelineItem } from "./components/Timeline"
+// src/App.tsx
+import { useState } from "react"
+import History from "./components/History"
+import FeedbackList from "./components/FeedbackList"
+import FAQ from "./components/🧩 FAQ"
 
-const WHATSAPP = "5511999990000" // troque pelo número real (apenas dígitos)
+// se sua imagem está em src/assets/vitoria.png:
+import heroImg from "./assets/vitoria2.jpeg"
+
+const WHATSAPP = "5511999990000"
 const wa = (msg: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`
-const heroImg =
-  "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=1600&q=80"
 
 export default function App() {
   const year = new Date().getFullYear()
-
-  const timelineItems: TimelineItem[] = [
-    {
-      date: "2018",
-      title: "Formação em Fisioterapia",
-      text: "Conclusão da graduação com iniciação científica em dor lombar crônica.",
-      image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=60",
-    },
-    {
-      date: "2019",
-      title: "Especialização em Ortopedia",
-      text: "Aprofundamento em reabilitação musculoesquelética e retorno ao esporte.",
-      image: "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?auto=format&fit=crop&w=900&q=60",
-    },
-    {
-      date: "2021",
-      title: "Pilates Clínico",
-      text: "Certificação e protocolos focados em cervical e lombar.",
-      image: "https://images.unsplash.com/photo-1588286840104-8957b019727f?auto=format&fit=crop&w=900&q=60",
-    },
-    {
-      date: "2024",
-      title: "Clínica Própria",
-      text: "Atendimento 1:1 com educação em dor e planos personalizados.",
-      image: "https://images.unsplash.com/photo-1580281657527-47f249e8f3c7?auto=format&fit=crop&w=900&q=60",
-    },
-  ]
+  const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <main className="site">
@@ -47,11 +25,34 @@ export default function App() {
 
       {/* Topbar */}
       <header className="topbar" role="banner">
-        <a href="#top" className="brand" aria-label="Início">
+        <a href="#top" className="brand" aria-label="Início" onClick={() => setMenuOpen(false)}>
           <span className="logo">V</span>
           <span>Vitória • Fisioterapia</span>
         </a>
-        <nav aria-label="Navegação primária">
+
+        {/* Botão hamburger (mobile) */}
+        <button
+          className={`nav-toggle ${menuOpen ? "is-open" : ""}`}
+          aria-label="Abrir menu"
+          aria-expanded={menuOpen}
+          aria-controls="primary-nav"
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          <span className="bar" />
+          <span className="bar" />
+          <span className="bar" />
+        </button>
+
+        {/* Navegação */}
+        <nav
+          id="primary-nav"
+          className={`nav ${menuOpen ? "is-open" : ""}`}
+          aria-label="Navegação primária"
+          onClick={(e) => {
+            const target = e.target as HTMLElement
+            if (target.tagName.toLowerCase() === "a") setMenuOpen(false)
+          }}
+        >
           <a href="#servicos">Serviços</a>
           <a href="#sobre">Sobre</a>
           <a href="#timeline">História</a>
@@ -65,7 +66,9 @@ export default function App() {
       {/* Hero */}
       <section id="top" className="hero container">
         <div className="hero__text">
-          <h1>Movimento com qualidade, <span className="grad">sem dor</span>.</h1>
+          <h1>
+            Movimento com qualidade, <span className="grad">sem dor</span>.
+          </h1>
           <p>
             Sou <strong>Vitória</strong>, fisioterapeuta. Juntas(os), vamos aliviar dores, recuperar função e
             voltar ao que você ama fazer.
@@ -82,13 +85,14 @@ export default function App() {
             <li>Planos individuais</li>
           </ul>
         </div>
-        <div className="hero__media">
-          <img src={heroImg} alt="Fisioterapeuta em atendimento" />
-          <div className="hero__card">
-            <strong>Agende online</strong>
-            <span>WhatsApp em 1 clique</span>
-          </div>
-        </div>
+<div className="hero__media">
+  <img src={heroImg} alt="Fisioterapeuta em atendimento" />
+  <div className="hero__card">
+    <strong>Agende online</strong>
+    <span>WhatsApp em 1 clique</span>
+  </div>
+</div>
+
       </section>
 
       {/* Serviços */}
@@ -132,8 +136,8 @@ export default function App() {
         </div>
       </section>
 
-      {/* Timeline */}
-      <Timeline heading="História" subheading="Minha jornada de formação e clínica." items={timelineItems} />
+      {/* História */}
+      <History />
 
       {/* Contato */}
       <section id="contato" className="section container contact">
@@ -190,6 +194,30 @@ export default function App() {
 
           <button className="btn" type="submit">Enviar pelo WhatsApp</button>
         </form>
+      </section>
+
+      {/* Feedback */}
+      <FeedbackList />
+
+      {/* FAQ */}
+      <FAQ />
+
+      {/* Mapa */}
+      <section id="mapa" className="section container">
+        <h2 className="h">Como chegar</h2>
+        <p className="sub muted">Atendimento presencial em Franca (SP)</p>
+        <div className="map-wrapper">
+          <iframe
+            title="Mapa – Clínica em Franca"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3738.798229199208!2d-47.40136962575971!3d-20.539321358368823!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94b0a996e56b9a9b%3A0x5b0c23b3e5a4541d!2sFranca%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1699999999999!5m2!1spt-BR!2sbr"
+            width="100%"
+            height="400"
+            style={{ border: 0, borderRadius: "var(--radius)" }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
       </section>
 
       {/* Rodapé */}
