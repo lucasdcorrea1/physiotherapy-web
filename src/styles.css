@@ -395,14 +395,19 @@ html[data-menu-open="true"] .scroll-progress{
   }
 }
 
+/* ====== Competências: padronizar altura dos cards ====== */
+#servicos .grid{ align-items: stretch; }
+#servicos .grid > .card{ height: 100%; display:flex; flex-direction:column; }
+#servicos .grid > .card h3{ margin-bottom:8px }
+#servicos .grid > .card p{ flex:1 1 auto } /* faz todos ficarem com a mesma altura por linha */
+
 /* ===================== Scroll lateral (MOBILE) ===================== */
-/* 🔧 ESPECIAL: #servicos mantém o TAMANHO ORIGINAL (largura cheia da coluna)
-   Usamos grid horizontal para cada card ter a MESMA largura da coluna única. */
+/* Competências (mantém largura “cheia” da coluna, mas com scroll horizontal) */
 @media (max-width: 900px){
   #servicos .grid{
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: minmax(240px, calc(100% - 32px)); /* ~largura “natural” da coluna cheia */
+    grid-auto-columns: minmax(240px, calc(100% - 32px));
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     gap: var(--sp-3);
@@ -412,13 +417,11 @@ html[data-menu-open="true"] .scroll-progress{
     scroll-padding-left: 16px;
     align-items: stretch;
   }
-  #servicos .grid > .card{
-    scroll-snap-align: start;
-    height: auto; /* mantém altura natural */
-  }
+  #servicos .grid > .card{ scroll-snap-align: start; height:auto }
+}
 
-  /* Interesses e Contato continuam com scroll lateral,
-     mas sem mexer no tamanho “full” do desktop */
+/* Interesses e Contato (scroll horizontal no mobile) */
+@media (max-width: 900px){
   #interesses .cards,
   .contact .cards{
     display: flex;
@@ -484,7 +487,8 @@ html[data-menu-open="true"] .scroll-progress{
   }
 }
 
-/* ===================== Stats (scroll lateral mobile) ===================== */
+/* ===================== Stats ===================== */
+/* Desktop/Tablet – grade normal */
 .stats{
   --min: clamp(120px, 28vw, 180px);
   display:grid; gap:var(--sp-3);
@@ -496,45 +500,19 @@ html[data-menu-open="true"] .scroll-progress{
 }
 .stat strong{ font-size: clamp(18px, 4vw, 24px); display:block }
 .stat span{ color:var(--muted) }
+
+/* Mobile – NÃO usa mais scroll; quebra em linhas automaticamente */
 @media (max-width: 900px){
   .stats{
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    display:grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 colunas no mobile */
     gap: var(--sp-3);
-    padding: 6px max(16px, calc(4vw + var(--safe-bottom))) 6px 16px;
-    margin-inline: -16px;
-    scroll-snap-type: x mandatory;
-    scroll-padding-left: 16px;
+    overflow: visible;           /* sem scroll lateral */
+    padding: 0;                  /* sem padding especial */
+    margin-inline: 0;
   }
-  .stat{
-    flex: 0 0 auto;
-    min-width: clamp(180px, 70vw, 240px);
-    scroll-snap-align: start;
-  }
-  .stats::-webkit-scrollbar{ height: 8px }
-  .stats::-webkit-scrollbar-track{
-    background: color-mix(in oklab, var(--bg) 82%, #000 18%);
-    border-radius: 99px;
-  }
-  .stats::-webkit-scrollbar-thumb{
-    background: color-mix(in oklab, var(--accent) 45%, var(--accent2) 55%);
-    border-radius: 99px;
-  }
-  .stats{
-    scrollbar-color: color-mix(in oklab, var(--accent) 45%, var(--accent2) 55%)
-                     color-mix(in oklab, var(--bg) 82%, #000 18%);
-    scrollbar-width: thin;
-  }
-}
-@media (max-width: 900px){
-  :root[data-theme="light"] .stats::-webkit-scrollbar-track{ background: #eaeef6; }
-  :root[data-theme="light"] .stats::-webkit-scrollbar-thumb{
-    background: color-mix(in oklab, var(--accent) 55%, var(--accent2) 45%);
-  }
-  :root[data-theme="light"] .stats{
-    scrollbar-color: color-mix(in oklab, var(--accent) 55%, var(--accent2) 45%) #eaeef6;
+  @media (max-width: 480px){
+    .stats{ grid-template-columns: 1fr; } /* empilha 1 por linha em telas muito pequenas */
   }
 }
 
