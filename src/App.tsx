@@ -169,11 +169,7 @@ export default function App() {
               Ver competências
             </a>
           </div>
-          <ul className="badges" aria-label="Destaques">
-            <li>Postura profissional & ética</li>
-            <li>Registro claro de desfechos</li>
-            <li>Acolhimento e escuta ativa</li>
-          </ul>
+
         </div>
         <div className="hero__media">
           <img src={heroImg} alt="Vitória Silva — Estudante de Fisioterapia" />
