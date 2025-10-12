@@ -20,11 +20,24 @@
 
   --hero-focus-y-desktop: 1%;
   --hero-focus-y-mobile: 1%;
-  --hero-shift: 57px; /* ≈ 1.5cm */
-
+  --hero-shift: 57px;
   --topbar-height: 64px;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Fundos opacos do menu mobile (sem blur “lavando”) */
+  --menu-bg-dark:#0b1020;
+  --menu-bg-light:#ffffff;
+}
+@supports (top: constant(safe-area-inset-top)) {
+  :root{
+    --safe-top: constant(safe-area-inset-top);
+    --safe-bottom: constant(safe-area-inset-bottom);
+  }
 }
 
+/* Fallback do sistema se o usuário não escolheu manualmente */
 @media (prefers-color-scheme: light){
   :root{
     --bg:#f5f7fb;
@@ -47,6 +60,11 @@ body{
   text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased;
 }
 img{ max-width:100%; height:auto; display:block }
+
+/* Empurra o conteúdo abaixo da topbar no mobile (evita hero sob o menu) */
+@media (max-width: 920px){
+  .site{ padding-top: calc(var(--topbar-height) + var(--safe-top)); }
+}
 
 /* ===================== Background ===================== */
 .bg{
@@ -72,24 +90,20 @@ img{ max-width:100%; height:auto; display:block }
 
 /* Desktop/Tablet: 2.5cm de margem lateral fixa */
 @media (min-width: 981px){
-  .container{
-    width:auto;
-    max-width:none;
-    margin-inline: 2.5cm;
-  }
+  .container{ width:auto; max-width:none; margin-inline: 2.5cm; }
 }
 
-/* ===================== Topbar + Menu ===================== */
+/* ===================== Topbar ===================== */
 .topbar{
   position:sticky; top:0; z-index:1950;
   backdrop-filter:saturate(1.15) blur(10px);
   background:rgba(11,16,32,.78);
   border-bottom:1px solid var(--line);
   padding:14px 18px;
-  display:flex; align-items:center; justify-content:space-between;
-  transition: transform .24s ease;
-  transform: translateY(0);
+  display:flex; align-items:center; gap:10px;
   height: var(--topbar-height);
+  transform: translateY(0);
+  transition: transform .24s ease;
 }
 .brand{
   display:flex; align-items:center; gap:10px; color:var(--ink);
@@ -106,83 +120,190 @@ img{ max-width:100%; height:auto; display:block }
   max-width:52vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
-.nav{ display:flex; align-items:center; gap:16px; flex-wrap:wrap }
-.nav a{
-  color:var(--ink); text-decoration:none; font-size:14.5px; font-weight:600;
-  opacity:.95; transition:opacity .15s ease;
+/* ===================== Theme switch (bolinha) ===================== */
+.theme-switch{
+  margin-left:auto;
+  width: 40px; height: 40px; border-radius: 999px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform .12s ease, filter .12s ease, border-color .12s ease, background-color .12s ease;
+  position: relative; z-index: 10021;
 }
-.nav a:hover{ opacity:1 }
+.theme-switch:hover{ transform: translateY(-1px); filter: brightness(1.03); }
+.theme-switch:active{ transform: translateY(0); filter: brightness(.98); }
+.theme-switch:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 35%, transparent), var(--shadow);
+}
 
+/* ===================== Hamburger ===================== */
 .nav-toggle{
-  display:none; width:42px; height:42px; border-radius:10px;
+  width:42px; height:42px; border-radius:10px; flex:0 0 auto;
   border:1px solid var(--line); background:var(--panel);
-  align-items:center; justify-content:center; gap:4px; flex-direction:column; cursor:pointer;
+  display:none; align-items:center; justify-content:center; gap:4px; flex-direction:column; cursor:pointer;
+  position: relative; z-index: 10021;
 }
 .nav-toggle .bar{ width:20px; height:2px; background:var(--ink); transition:transform .2s ease, opacity .2s ease }
 .nav-toggle.is-open .bar:nth-child(1){ transform:translateY(6px) rotate(45deg) }
 .nav-toggle.is-open .bar:nth-child(2){ opacity:0 }
 .nav-toggle.is-open .bar:nth-child(3){ transform:translateY(-6px) rotate(-45deg) }
 
-/* === Mobile: esconde header ao rolar e abre painel full-screen clicável === */
+/* ===================== Navegação (Desktop) ===================== */
+.nav{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.nav a{
+  color:var(--ink); text-decoration:none; font-size:14.5px; font-weight:600;
+  opacity:.95; transition:opacity .15s ease;
+}
+.nav a:hover{ opacity:1 }
+.nav-desktop{ margin-left:8px; }
+
 @media (max-width: 920px){
+  .nav-desktop{ display:none; }
   .nav-toggle{ display:flex }
+  .brand span:last-child{ max-width:calc(100vw - 210px) }
+}
+
+/* ===================== Navegação MOBILE (usa .nav do JSX) ===================== */
+@media (max-width: 920px){
+  /* Topbar fixa no mobile para hide-on-scroll (classe .is-hidden) */
+  .topbar{
+    position: fixed; left:0; right:0; top:0;
+    z-index: 10020;
+  }
   .topbar.is-hidden{ transform: translateY(calc(-1 * var(--topbar-height))); }
 
+  /* Painel do menu: vertical, por cima do conteúdo e ABAIXO da topbar */
   .nav{
     position: fixed;
-    left: 0; right: 0; top: var(--topbar-height); bottom: 0;
-    z-index: 2000;
-    display:none; flex-direction:column; gap:12px;
-    padding: 18px 18px calc(18px + env(safe-area-inset-bottom, 0px));
-    background: rgba(11,16,32,.96);
-    backdrop-filter: blur(6px) saturate(1.05);
-    border-top:1px solid rgba(255,255,255,.22);
+    left: 0; right: 0;
+    top: calc(var(--safe-top) + var(--topbar-height));
+    height: calc(100svh - var(--topbar-height) - var(--safe-top) - var(--safe-bottom));
+    z-index: 10010;               /* abaixo da topbar, acima do conteúdo */
+    display: none;
+
+    /* vertical */
+    grid-auto-rows: min-content;
+    align-content: start;
+    gap: 8px;
+    padding: 16px 16px calc(16px + var(--safe-bottom));
+
+    /* opaco e sem blur */
+    background: var(--menu-bg-dark);
+    border-top:1px solid rgba(255,255,255,.18);
+    box-shadow: 0 -12px 28px rgba(0,0,0,.35);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    isolation: isolate;
+    transform: translateZ(0);
   }
-  .nav.is-open{ display:flex }
-  .nav a{ padding:12px 8px; opacity:1; font-size:18px }
+  .nav.is-open{ display: grid; }
 
-  .brand span:last-child{ max-width:calc(100vw - 160px) }
+  /* Se o header esconder, menu ocupa tudo até o safe-top */
+  html[data-header-hidden="true"] .nav{
+    top: var(--safe-top);
+    height: calc(100svh - var(--safe-top) - var(--safe-bottom));
+  }
+
+  /* Links: contraste forte e toque confortável */
+  .nav a{
+    display:block; width:100%;
+    padding:16px 12px;
+    font-size:18px;
+    color: var(--ink);
+    border-radius:12px;
+    border:1px solid transparent;
+    background: transparent;
+    transition: background .12s ease, border-color .12s ease, transform .06s ease;
+  }
+  .nav a:hover{
+    background: rgba(255,255,255,.07);
+    border-color: rgba(255,255,255,.15);
+  }
+  .nav a:active{ transform: translateY(1px) }
+
+  /* CTA final – sempre gradiente e legível */
+  .nav .btn.small{
+    display:block; text-align:center;
+    padding:14px 16px; font-size:16px; margin-top:4px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent)) !important;
+    color: #06131f !important;
+    border: 0 !important;
+    box-shadow: var(--shadow);
+  }
+  .nav .btn.small:hover{ filter: brightness(1.03); }
+  .nav .btn.small:active{ filter: brightness(.98); }
+
+  /* Scrim (abaixo da topbar) — clica e fecha (JS já faz) */
+  .nav-scrim{
+    position: fixed;
+    left:0; right:0;
+    top: calc(var(--safe-top) + var(--topbar-height));
+    bottom:0;
+    z-index: 10005;               /* entre conteúdo e painel */
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  html[data-header-hidden="true"] .nav-scrim{ top: var(--safe-top); }
+
+  /* Ao abrir o menu, tiramos o blur da topbar pra não parecer que o menu está “atrás” */
+  html[data-menu-open="true"] .topbar{
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(11,16,32,.92);
+  }
+
+  /* Garante que a mídia do hero nunca fique acima do overlay */
+  .hero__media{ position:relative; z-index:0; }
 }
 
-/* Desktop: header nunca esconde */
-@media (min-width: 921px){
-  .topbar{ transform: translateY(0) !important }
+/* Tema claro do menu mobile */
+@media (max-width: 920px){
+  :root[data-theme="light"] .nav{
+    background: var(--menu-bg-light);
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -10px 24px rgba(16,24,40,.12);
+  }
+  :root[data-theme="light"] .nav a{
+    color: #0f172a;
+  }
+  :root[data-theme="light"] .nav a:hover{
+    background: #f2f5fb;
+    border-color: #e5eaf2;
+  }
+  html[data-menu-open="true"][data-theme="light"] .topbar{
+    background: rgba(255,255,255,.98);
+  }
 }
 
-/* Scrim atrás do painel (clique fecha) */
-.nav-scrim{
-  position: fixed; inset: 0;
-  z-index: 1900;
-  background: rgba(0,0,0,.45);
-  backdrop-filter: blur(2px);
-  border: 0;
-}
-
-/* Quando o menu abre, o header trava no topo */
-.topbar.menu-open{ transform: translateY(0) !important }
-
-/* ===================== Barra de Progresso (sempre visível) ===================== */
+/* ===================== Barra de Progresso ===================== */
 .scroll-progress{
   position: fixed;
-  left: 0; right: 0; top: 0;
+  left: 0; right: 0;
+  top: var(--safe-top);
   height: 3px;
   background: transparent;
   overflow: hidden;
-  z-index: 1500;           /* abaixo do header (1950) e do menu (2000) */
+  z-index: 9980;                 /* abaixo da topbar/nav mobile */
   pointer-events: none;
 }
-html[data-header-hidden="false"] .scroll-progress{
-  top: var(--topbar-height);
+html[data-header-hidden="false"] .scroll-progress,
+html[data-menu-open="true"] .scroll-progress{
+  top: calc(var(--safe-top) + var(--topbar-height));
 }
 @media (min-width: 921px){
-  .scroll-progress{ top: var(--topbar-height) !important; }
+  .scroll-progress{ top: calc(var(--safe-top) + var(--topbar-height)) !important; z-index:1500; }
 }
 .scroll-progress__bar{
-  width: 100%;
-  height: 100%;
-  transform-origin: left center;
-  transform: scaleX(0);
-  /* escuro → médio → claro */
+  width: 100%; height: 100%;
+  transform-origin: left center; transform: scaleX(0);
   background: linear-gradient(
     90deg,
     color-mix(in oklab, var(--accent2) 85%, #000 15%) 0%,
@@ -190,9 +311,7 @@ html[data-header-hidden="false"] .scroll-progress{
     color-mix(in oklab, var(--accent) 70%, #fff 30%) 100%
   );
   box-shadow: 0 0 6px color-mix(in oklab, var(--accent2) 25%, transparent);
-  will-change: transform;
 }
-
 
 /* ===================== Buttons ===================== */
 .btn{
@@ -229,7 +348,7 @@ html[data-header-hidden="false"] .scroll-progress{
 .badges{ display:flex; gap:var(--sp-2); flex-wrap:wrap; padding:0; margin:var(--sp-3) 0 0; list-style:none }
 .badges li{ padding:8px 12px; border-radius:999px; background:var(--glass); border:1px solid var(--line); color:var(--ink); font-size:13px }
 
-.hero__media{ position:relative; overflow:visible }
+.hero__media{ position:relative; overflow:visible; z-index:0; }
 .hero__media img{
   width:100%;
   border-radius:var(--radius-lg);
@@ -252,8 +371,7 @@ html[data-header-hidden="false"] .scroll-progress{
 /* ======== Mobile ======== */
 @media (max-width: 980px){
   .hero{
-    grid-template-columns:1fr;
-    padding:var(--sp-7) 0;
+    grid-template-columns:1fr; padding:var(--sp-7) 0;
   }
   .hero__text{ order:1; margin-bottom: var(--sp-4) }
   .hero__media{ order:2 }
@@ -320,28 +438,18 @@ html[data-header-hidden="false"] .scroll-progress{
 }
 .fab:hover{ filter:brightness(1.05) }
 
-/* ===================== Timeline (History) ===================== */
-.tl{
-  position:relative; margin-top:var(--sp-3); display:grid; gap:var(--sp-4);
-}
-.tl__line{
-  position:absolute; left:50%; top:0; bottom:0; width:2px;
-  background:linear-gradient(#97a4be44,#97a4be88);
-  transform:translateX(-50%); z-index:0;
-}
+/* ===================== Timeline ===================== */
+.tl{ position:relative; margin-top:var(--sp-3); display:grid; gap:var(--sp-4); }
+.tl__line{ position:absolute; left:50%; top:0; bottom:0; width:2px;
+  background:linear-gradient(#97a4be44,#97a4be88); transform:translateX(-50%); z-index:0; }
 .tl__item{
-  position:relative;
-  display:grid; grid-template-columns: 1fr 80px 1fr;
-  align-items:center; gap:var(--sp-3);
-  min-height:220px; isolation:isolate;
+  position:relative; display:grid; grid-template-columns: 1fr 80px 1fr;
+  align-items:center; gap:var(--sp-3); min-height:220px; isolation:isolate;
   opacity:0; transform: translateY(12px);
   transition: all .6s cubic-bezier(.2,.65,.2,1);
 }
 .tl__item.reveal{ opacity:1; transform: translateY(0) }
-
-/* Removida a bolinha/pino */
 .tl__item::before{ display:none }
-
 .tl__date{
   grid-column:2; justify-self:center; position:relative; top:-18px;
   padding:4px 10px; border-radius:999px; background:var(--panel);
@@ -351,7 +459,6 @@ html[data-header-hidden="false"] .scroll-progress{
 }
 .tl__item.left  .tl__media{ grid-column:1 } .tl__item.left  .tl__content{ grid-column:3 }
 .tl__item.right .tl__media{ grid-column:3 } .tl__item.right .tl__content{ grid-column:1 }
-
 .tl__media{ position:relative; z-index:0 }
 .tl__media::before{
   content:""; position:absolute; inset:0; border-radius:16px;
@@ -373,11 +480,7 @@ html[data-header-hidden="false"] .scroll-progress{
 /* ====== Responsivo Timeline ====== */
 @media (max-width: 900px){
   .tl__line{ left:16px; transform:none }
-  .tl__item{
-    grid-template-columns: 28px 1fr;
-    gap:var(--sp-2);
-    min-height:180px;
-  }
+  .tl__item{ grid-template-columns: 28px 1fr; gap:var(--sp-2); min-height:180px; }
   .tl__date{ grid-column:1; justify-self:center; top:-12px }
   .tl__item.left  .tl__media,
   .tl__item.left  .tl__content,
@@ -386,9 +489,7 @@ html[data-header-hidden="false"] .scroll-progress{
 }
 
 /* ===================== Breakpoints extras ===================== */
-@media (max-width: 1100px){
-  .hero__text h1{ font-size:44px }
-}
+@media (max-width: 1100px){ .hero__text h1{ font-size:44px } }
 @media (max-width: 980px){
   .about .about__split{ grid-template-columns:1fr }
   .section{ padding:var(--sp-8) 0 }
@@ -401,49 +502,96 @@ html[data-header-hidden="false"] .scroll-progress{
   .badges li{ font-size:12.5px; padding:7px 10px }
 }
 
-/* Interesses — títulos e descrições em linhas separadas */
-.interests .card {
-  display: block;
-  padding: var(--sp-4);
-}
+/* Interesses */
+.interests .card { display:block; padding: var(--sp-4); }
+.interest-title { display:block; margin:0 0 6px; font-size:16.5px; letter-spacing:-.01em; color: var(--ink-strong); }
+.interest-desc { display:block; color:var(--muted); line-height:1.5; word-break:break-word; }
 
-.interest-title {
-  display: block;                /* força o título numa linha só */
-  margin: 0 0 6px;               /* espaço entre título e descrição */
-  font-size: 16.5px;
-  letter-spacing: -.01em;
-  color: var(--ink-strong);
-}
-
-.interest-desc {
-  display: block;                /* descrição abaixo do título */
-  color: var(--muted);
-  line-height: 1.5;
-  word-break: break-word;        /* evita “grudar” se vier algo longo */
-}
-/* === FIX: hero img visível e sem empurrar conteúdo no mobile === */
+/* === FIX hero mobile sem empurrar === */
 @media (max-width: 980px){
-  :root{
-    /* zera o deslocamento vertical da imagem no mobile */
-    --hero-shift: 0px;
-  }
-
-  .hero{
-    grid-template-columns: 1fr;   /* já está 1fr, reforçando */
-    gap: var(--sp-4);
-    padding: var(--sp-7) 0 var(--sp-6);
-    align-items: start;
-  }
-
-  /* imagem primeiro no mobile; texto depois */
-  .hero__media{ order: 1 }
-  .hero__text{ order: 2 }
-
-  .hero__media img{
-    /* mantém proporção boa e não “desce” mais */
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    object-position: center var(--hero-focus-y-mobile);
-    transform: translateY(0);     /* crucial: sem deslocamento */
-  }
+  :root{ --hero-shift: 0px; }
+  .hero{ grid-template-columns: 1fr; gap: var(--sp-4); padding: var(--sp-7) 0 var(--sp-6); align-items: start; }
+  .hero__media{ order: 1 } .hero__text{ order: 2 }
+  .hero__media img{ aspect-ratio: 4 / 3; object-fit: cover; object-position: center var(--hero-focus-y-mobile); transform: translateY(0); }
 }
+
+/* ===================== LIGHT THEME (via <html data-theme="light">) ===================== */
+:root[data-theme="light"]{
+  --bg: #f7f9fc;
+  --panel: rgba(8, 28, 66, .05);
+  --glass: rgba(8, 28, 66, .06);
+  --ink: #0f172a;
+  --ink-strong: #0b1324;
+  --muted: #5b667a;
+  --line: #e6eaf2;
+  --shadow: 0 10px 36px rgba(16,24,40,.08);
+}
+
+/* Topbar claro */
+:root[data-theme="light"] .topbar{
+  background: rgba(255,255,255,.82);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: saturate(1.1) blur(10px);
+}
+
+/* Gradiente de título no claro */
+:root[data-theme="light"] .grad{
+  background: linear-gradient(90deg, #1f2937, var(--accent), var(--accent2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+/* Cards no claro */
+:root[data-theme="light"] .card{
+  background: #ffffff; border-color: #e8edf5;
+  box-shadow: 0 6px 22px rgba(16,24,40,.06); color: var(--ink);
+}
+:root[data-theme="light"] .card.hover:hover{
+  background: #ffffff; border-color: #dde6f2; transform: translateY(-4px);
+  box-shadow: 0 10px 32px rgba(16,24,40,.10);
+}
+:root[data-theme="light"] .card h3{ color: var(--ink-strong) }
+:root[data-theme="light"] .card p{ color: var(--muted) }
+
+/* Stats, hero__card e form no claro */
+:root[data-theme="light"] .stat,
+:root[data-theme="light"] .tl__content,
+:root[data-theme="light"] .form{
+  background:#fff; border-color:#e8edf5; box-shadow:0 6px 22px rgba(16,24,40,.06); color:var(--ink);
+}
+:root[data-theme="light"] .hero__card{
+  background: rgba(255,255,255,.78); border-color: #e8eef7;
+  box-shadow: 0 10px 28px rgba(16,24,40,.10);
+  backdrop-filter: blur(10px) saturate(1.05);
+  color: var(--ink);
+}
+:root[data-theme="light"] .tl__title{ color: var(--ink-strong) }
+:root[data-theme="light"] .tl__text{ color: var(--muted) }
+
+/* Badges claras */
+:root[data-theme="light"] .badges li{
+  background: rgba(255,255,255,.7);
+  border-color: #e8edf5;
+  color: var(--ink);
+}
+
+/* Form placeholders/labels no claro */
+:root[data-theme="light"] .form input,
+:root[data-theme="light"] .form textarea{ color:#0b1324; background:#fff; border-color: var(--line); }
+:root[data-theme="light"] .form input::placeholder,
+:root[data-theme="light"] .form textarea::placeholder{ color:#6b7280 }
+:root[data-theme="light"] .field label{ color:#334155 }
+:root[data-theme="light"] .form .hint{ color:#667085 }
+
+/* Botões no claro */
+:root[data-theme="light"] .btn{ color:#ffffff }
+:root[data-theme="light"] .btn.ghost{
+  color: var(--ink);
+  border: 1px solid color-mix(in oklab, var(--accent) 30%, var(--line));
+}
+
+/* Footer & FAB no claro */
+:root[data-theme="light"] .footer{ color: var(--muted) }
+:root[data-theme="light"] .fab{ border-color: #e8edf5 }
+
+/* Fundo claro com sombra interna sutil */
+:root[data-theme="light"] .bg{ box-shadow: inset 0 0 160px rgba(20,30,55,.08); }

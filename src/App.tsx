@@ -1,5 +1,5 @@
 // src/App.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import History from "./components/History";
 import FeedbackList from "./components/FeedbackList";
 import FAQ from "./components/🧩 FAQ";
@@ -12,11 +12,29 @@ const WHATSAPP = "5535998193849"; // +55 35 99819-3849 (apenas dígitos)
 const wa = (msg: string) =>
   `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
+type Theme = "dark" | "light";
+
 export default function App() {
   const year = new Date().getFullYear();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // breakpoint p/ aplicar hide-on-scroll só no mobile
+  // THEME: inicial com localStorage e prefers-color-scheme
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") return "dark";
+    const saved = localStorage.getItem("theme") as Theme | null;
+    if (saved === "light" || saved === "dark") return saved;
+    const prefersLight = window.matchMedia?.("(prefers-color-scheme: light)").matches;
+    return prefersLight ? "light" : "dark";
+  });
+
+  // aplica no <html data-theme="..."> e persiste
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  // breakpoint p/ comportamento mobile
   const [isMobile, setIsMobile] = useState<boolean>(() =>
     typeof window !== "undefined"
       ? window.matchMedia("(max-width: 920px)").matches
@@ -47,17 +65,12 @@ export default function App() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [isMobile, headerHidden]);
 
-  // travar/destravar scroll do body quando o menu abrir (somente mobile)
+  // travar/destravar scroll quando o menu mobile abrir
   useEffect(() => {
     const lock = menuOpen && isMobile;
     document.body.style.overflow = lock ? "hidden" : "";
-    document.documentElement.setAttribute(
-      "data-menu-open",
-      lock ? "true" : "false"
-    );
-    return () => {
-      document.body.style.overflow = "";
-    };
+    document.documentElement.setAttribute("data-menu-open", lock ? "true" : "false");
+    return () => { document.body.style.overflow = ""; };
   }, [menuOpen, isMobile]);
 
   // expõe flag no <html> para posicionar a barra de progresso
@@ -68,6 +81,39 @@ export default function App() {
     );
   }, [headerHidden]);
 
+  // alternar tema
+  const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+
+  // fechar menu com ESC
+  const onKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === "Escape") setMenuOpen(false);
+  }, []);
+  useEffect(() => {
+    if (menuOpen) window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [menuOpen, onKeyDown]);
+
+  // Component com os links (reutilizado no desktop e no mobile)
+  const NavLinks = () => (
+    <>
+      <a href="#servicos">Competências</a>
+      <a href="#sobre">Sobre</a>
+      <a href="#timeline">História</a>
+      <a href="#interesses">Interesses</a>
+      <a href="#contato">Contato</a>
+      <a
+        className="btn small"
+        href={wa(
+          "Olá, tudo bem? Gostaria de conversar sobre uma oportunidade de estágio em Fisioterapia."
+        )}
+        target="_blank"
+        rel="noreferrer"
+      >
+        Conversar sobre estágio
+      </a>
+    </>
+  );
+
   return (
     <main className="site">
       {/* Fundo */}
@@ -75,9 +121,7 @@ export default function App() {
 
       {/* Topbar */}
       <header
-        className={`topbar ${headerHidden ? "is-hidden" : ""} ${
-          menuOpen ? "menu-open" : ""
-        }`}
+        className={`topbar ${headerHidden ? "is-hidden" : ""} ${menuOpen ? "menu-open" : ""}`}
         role="banner"
       >
         <a
@@ -90,50 +134,60 @@ export default function App() {
           <span>Vitória Silva • Fisioterapia</span>
         </a>
 
+        {/* Bolinha do tema (ícone) */}
+        <button
+          className="theme-switch"
+          onClick={toggleTheme}
+          aria-label={`Mudar para tema ${theme === "dark" ? "claro" : "escuro"}`}
+          title={theme === "dark" ? "Tema claro" : "Tema escuro"}
+          type="button"
+        >
+          <span aria-hidden>{theme === "dark" ? "☀️" : "🌙"}</span>
+        </button>
+
         {/* Botão hamburger (mobile) */}
         <button
           className={`nav-toggle ${menuOpen ? "is-open" : ""}`}
-          aria-label="Abrir menu"
+          aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
           aria-expanded={menuOpen}
           aria-controls="primary-nav"
           onClick={() => setMenuOpen((v) => !v)}
+          type="button"
         >
           <span className="bar" />
           <span className="bar" />
           <span className="bar" />
         </button>
 
-        {/* Navegação */}
-        <nav
-          id="primary-nav"
-          className={`nav ${menuOpen ? "is-open" : ""}`}
-          aria-label="Navegação primária"
-          onClick={(e) => {
-            const target = e.target as HTMLElement;
-            if (target.tagName.toLowerCase() === "a") setMenuOpen(false);
-          }}
-        >
-          <a href="#servicos">Competências</a>
-          <a href="#sobre">Sobre</a>
-          <a href="#timeline">História</a>
-          <a href="#interesses">Interesses</a>
-          <a href="#contato">Contato</a>
-          <a
-            className="btn small"
-            href={wa(
-              "Olá, tudo bem? Gostaria de conversar sobre uma oportunidade de estágio em Fisioterapia."
-            )}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Conversar sobre estágio
-          </a>
+        {/* Navegação DESKTOP (fica dentro do header; some no mobile via CSS) */}
+        <nav className="nav nav-desktop" aria-label="Navegação primária (desktop)">
+          <NavLinks />
         </nav>
       </header>
 
-      {/* Scrim (fundo escuro atrás do painel do menu) */}
+      {/* Scrim + Navegação MOBILE (fora do header, por cima de tudo) */}
       {isMobile && menuOpen && (
-        <div className="nav-scrim" onClick={() => setMenuOpen(false)} aria-hidden />
+        <div
+          className="nav-scrim"
+          onClick={() => setMenuOpen(false)}
+          aria-hidden
+        />
+      )}
+
+      {isMobile && (
+        <nav
+          id="primary-nav"
+          className={`nav nav-overlay ${menuOpen ? "is-open" : ""}`}
+          aria-label="Navegação primária (mobile)"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            const t = e.target as HTMLElement;
+            if (t.tagName.toLowerCase() === "a") setMenuOpen(false);
+          }}
+        >
+          <NavLinks />
+        </nav>
       )}
 
       {/* Barra de progresso sempre visível */}
@@ -157,9 +211,7 @@ export default function App() {
           <div className="hero__cta">
             <a
               className="btn"
-              href={wa(
-                "Olá! Sou a Vitória Silva (Fisioterapia). Podemos conversar sobre estágio?"
-              )}
+              href={wa("Olá! Sou a Vitória Silva (Fisioterapia). Podemos conversar sobre estágio?")}
               target="_blank"
               rel="noreferrer"
             >
@@ -169,7 +221,6 @@ export default function App() {
               Ver competências
             </a>
           </div>
-
         </div>
         <div className="hero__media">
           <img src={heroImg} alt="Vitória Silva — Estudante de Fisioterapia" />
@@ -288,9 +339,7 @@ export default function App() {
         <div className="cards contact__cards">
           <a
             className="card link"
-            href={wa(
-              "Olá, Vitória! Gostaria de conversar sobre uma oportunidade de estágio."
-            )}
+            href={wa("Olá, Vitória! Gostaria de conversar sobre uma oportunidade de estágio.")}
             target="_blank"
             rel="noreferrer"
           >
@@ -359,9 +408,7 @@ export default function App() {
             </small>
           </div>
 
-          <button className="btn" type="submit">
-            Enviar pelo WhatsApp
-          </button>
+          <button className="btn" type="submit">Enviar pelo WhatsApp</button>
         </form>
       </section>
 
