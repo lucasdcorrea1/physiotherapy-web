@@ -181,7 +181,14 @@ img{ max-width:100%; height:auto; display:block }
     position: fixed;
     left: 0; right: 0;
     top: calc(var(--safe-top) + var(--topbar-height));
-    height: calc(100svh - var(--topbar-height) - var(--safe-top) - var(--safe-bottom));
+
+    /* ===== SCROLL VISÍVEL NO IPHONE 15 / iOS ===== */
+    height: calc(100dvh - var(--topbar-height) - var(--safe-top) - var(--safe-bottom));
+    min-height: 280px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+
     z-index: 10010;               /* abaixo da topbar, acima do conteúdo */
     display: none;
 
@@ -189,7 +196,7 @@ img{ max-width:100%; height:auto; display:block }
     grid-auto-rows: min-content;
     align-content: start;
     gap: 8px;
-    padding: 16px 16px calc(16px + var(--safe-bottom));
+    padding: 16px 16px max(16px, var(--safe-bottom));
 
     /* opaco e sem blur */
     background: var(--menu-bg-dark);
@@ -198,8 +205,6 @@ img{ max-width:100%; height:auto; display:block }
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
     isolation: isolate;
     transform: translateZ(0);
   }
@@ -208,7 +213,7 @@ img{ max-width:100%; height:auto; display:block }
   /* Se o header esconder, menu ocupa tudo até o safe-top */
   html[data-header-hidden="true"] .nav{
     top: var(--safe-top);
-    height: calc(100svh - var(--safe-top) - var(--safe-bottom));
+    height: calc(100dvh - var(--safe-top) - var(--safe-bottom));
   }
 
   /* Links: contraste forte e toque confortável */
@@ -237,21 +242,22 @@ img{ max-width:100%; height:auto; display:block }
     border: 0 !important;
     box-shadow: var(--shadow);
   }
-  .nav .btn.small:hover{ filter: brightness(1.03); }
-  .nav .btn.small:active{ filter: brightness(.98); }
 
   /* Scrim (abaixo da topbar) — clica e fecha (JS já faz) */
   .nav-scrim{
     position: fixed;
     left:0; right:0;
     top: calc(var(--safe-top) + var(--topbar-height));
-    bottom:0;
+    height: calc(100dvh - var(--topbar-height) - var(--safe-top));
     z-index: 10005;               /* entre conteúdo e painel */
     background: rgba(0,0,0,.45);
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
   }
-  html[data-header-hidden="true"] .nav-scrim{ top: var(--safe-top); }
+  html[data-header-hidden="true"] .nav-scrim{
+    top: var(--safe-top);
+    height: calc(100dvh - var(--safe-top));
+  }
 
   /* Ao abrir o menu, tiramos o blur da topbar pra não parecer que o menu está “atrás” */
   html[data-menu-open="true"] .topbar{
@@ -382,7 +388,14 @@ html[data-menu-open="true"] .scroll-progress{
 }
 
 /* ===================== Cards / Grids ===================== */
-.grid{ display:grid; gap:var(--sp-3); grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)) }
+.grid{
+  display:grid; gap:var(--sp-3);
+  grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+}
+.cards{
+  display:grid; gap:var(--sp-3);
+  grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+}
 .card{
   background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:var(--sp-4);
   box-shadow:var(--shadow)
@@ -392,12 +405,32 @@ html[data-menu-open="true"] .scroll-progress{
 .card h3{ margin:6px 0 6px }
 .card p{ color:var(--muted); margin:0 0 10px }
 
+/* ====== RESPONSIVIDADE EXTRA PARA CARDS ====== */
+@media (max-width: 860px){
+  .grid{ grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); }
+  .cards{ grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); }
+}
+@media (max-width: 640px){
+  .grid{ grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); }
+  .cards{ grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); }
+}
+@media (max-width: 420px){
+  .grid{ grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); }
+  .cards{ grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); }
+}
+
 /* ===================== Sobre ===================== */
 .about .about__split{
   display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-3); margin-top:var(--sp-2)
 }
 .list{ margin:0; padding:0; list-style:none; color:var(--muted) }
-.stats{ display:grid; grid-template-columns:repeat(3, 1fr); gap:var(--sp-3) }
+
+/* Stats mais responsivo */
+.stats{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap:var(--sp-3);
+}
 .stat{
   text-align:center; background:var(--panel); border:1px solid var(--line);
   border-radius:14px; padding:var(--sp-3); box-shadow:var(--shadow)
@@ -406,7 +439,6 @@ html[data-menu-open="true"] .scroll-progress{
 .stat span{ color:var(--muted) }
 
 /* ===================== Contato / Form ===================== */
-.cards{ display:grid; gap:var(--sp-3); grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)) }
 .link{ text-decoration:none; color:inherit; transition:transform .12s ease }
 .link:hover{ transform:translateY(-2px) }
 
